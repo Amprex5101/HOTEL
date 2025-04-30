@@ -16,7 +16,7 @@ function Navbar() {
   return (
     <nav className="navbar">
       <div className="navbar-brand">
-        <Link to="/">Mi App</Link>
+        <Link to="/">HOTELES</Link>
       </div>
       
       <div className="navbar-links">

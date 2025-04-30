@@ -1,26 +1,67 @@
-
 .home-container {
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  align-content:baseline;
   height: calc(100vh - 100px);
-  width: 100%;      
+  width: 100%;
+  background-image: url('../assets/Fondo.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  position: relative;
+}
+
+/* Overlay para mejorar legibilidad del texto sobre la imagen */
+.home-container::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.4); /* Overlay oscuro semitransparente */
+  z-index: 1;
+}
+
+.home-container h1, .home-container h2, .home-container * {
+  position: relative;
+  z-index: 2; /* Asegura que el contenido esté sobre el overlay */
+  color: white; /* Cambia el color del texto a blanco para mejor contraste */
 }
 
 .home-container h1 {
-  font-size: 2rem;
-  font-weight: 600;
-  color: #333;
+  font-size: 2.5rem;
+  font-weight: 700;
   padding: 0px;
-  margin: 0px;
+  margin: 0 0 20px 0;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5); /* Sombra para mejor legibilidad */
 } 
 
 .home-container h2 {
-  font-size: 1.5rem;
+  font-size: 1.8rem;
   font-weight: 400;
-  color: #333;
   padding: 0px;
-  margin: 0px;  
+  margin: 0px;
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5); /* Sombra para mejor legibilidad */
+}
+
+.reserve-now-btn {
+  margin-top: 30px;
+  padding: 12px 35px;
+  background-color: var(--primary, #0B3C5D);
+  color: white;
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.reserve-now-btn:hover {
+  background-color: var(--secondary, #D4AF37);
+  transform: translateY(-3px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
 }
