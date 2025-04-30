@@ -9,6 +9,8 @@ import Register from './pages/Register.jsx'
 import Dashboard from './pages/Dashboard.jsx'
 import Users from './pages/Users.jsx'
 import ProtectedRoute from './components/ProtectedRoute.jsx'
+import Editar from './pages/Editar.jsx'
+import Crear from './pages/Crear.jsx'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
@@ -23,6 +25,8 @@ createRoot(document.getElementById('root')).render(
             <Route element={<ProtectedRoute />}>
               <Route path='/dashboard' element={<Dashboard />} /> 
               <Route path='/users' element={<Users />} /> 
+              <Route path="/editar/:id" element={<Editar />} />
+              <Route path="/crear" element={<Crear />} />
               {/* Puedes agregar más rutas protegidas aquí */}
             </Route>
           </Route>

@@ -6,7 +6,7 @@ import Register from './pages/Register'
 import Dashboard from './pages/Dashboard'
 import Usuarios from './pages/Users'
 import ProtectedRoute from './components/ProtectedRoute'
-
+import Editar from './pages/Editar'
 function App() {
   return (
     <Router>
@@ -28,6 +28,14 @@ function App() {
           element={
             <ProtectedRoute>
               <Usuarios />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/editar/:id" 
+          element={
+            <ProtectedRoute>
+              <Editar />
             </ProtectedRoute>
           } 
         />

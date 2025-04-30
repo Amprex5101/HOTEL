@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import './Users.css';
 
@@ -11,7 +12,15 @@ function Users() {
   // Estados para la paginación
   const [currentPage, setCurrentPage] = useState(1);
   const [usersPerPage, setUsersPerPage] = useState(10);
-
+  
+  // Nuevo estado para los usuarios seleccionados
+  const [selectedUsers, setSelectedUsers] = useState([]);
+  
+  // Nuevo estado para manejar modales de confirmación
+  const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
+  const [deleteInProgress, setDeleteInProgress] = useState(false);
+  const navigate = useNavigate();
+  
   useEffect(() => {
     const fetchUsers = async () => {
       try {
@@ -49,10 +58,89 @@ function Users() {
     }
   };
 
+  // Función para manejar la selección de usuarios
+  const handleUserSelection = (userId) => {
+    setSelectedUsers(prevSelected => {
+      if (prevSelected.includes(userId)) {
+        // Si ya está seleccionado, lo quitamos
+        return prevSelected.filter(id => id !== userId);
+      } else {
+        // Si no está seleccionado, lo agregamos
+        return [...prevSelected, userId];
+      }
+    });
+  };
+
   // Cambiar cantidad de usuarios por página
   const handleUsersPerPageChange = (e) => {
     setUsersPerPage(parseInt(e.target.value));
     setCurrentPage(1); // Resetear a la primera página cuando cambia el tamaño
+  };
+
+  // Función para eliminar usuarios seleccionados
+  const handleDeleteUsers = () => {
+    // Simplemente mostrar el modal sin establecer deleteInProgress todavía
+    setShowDeleteConfirmation(true);
+  };
+  
+  // Función para confirmar y ejecutar la eliminación
+  const confirmDeleteUsers = async () => {
+    try {
+      // Establecer estado de eliminación en progreso
+      setDeleteInProgress(true);
+      
+      // Si hay varios usuarios seleccionados, hacer una solicitud por lotes
+      if (selectedUsers.length > 1) {
+        await axios.delete('http://localhost:3000/api/users/batch', {
+          data: { userIds: selectedUsers }
+        });
+      } else {
+        // Si es un solo usuario, hacer una solicitud individual
+        await axios.delete(`http://localhost:3000/api/users/${selectedUsers[0]}`);
+      }
+      
+      // Actualizar la lista de usuarios (eliminar los seleccionados del estado local)
+      setUsers(prevUsers => prevUsers.filter(user => 
+        !selectedUsers.includes(user.id || user._id)
+      ));
+      
+      // Limpiar la selección
+      setSelectedUsers([]);
+      
+      // Cerrar confirmación
+      setShowDeleteConfirmation(false);
+      setDeleteInProgress(false);
+      
+      // Si después de eliminar no quedan usuarios en la página actual,
+      // ir a la página anterior (excepto si estamos en la primera)
+      if (currentUsers.length === selectedUsers.length && currentPage > 1) {
+        setCurrentPage(currentPage - 1);
+      }
+    } catch (err) {
+      console.error("Error al eliminar usuarios:", err);
+      setDeleteInProgress(false);
+      setShowDeleteConfirmation(false);
+      // Aquí podrías mostrar un mensaje de error
+    }
+  };
+  
+  // Función para cancelar la eliminación
+  const cancelDeleteUsers = () => {
+    setShowDeleteConfirmation(false);
+    setDeleteInProgress(false);
+  };
+
+  // Función para editar un usuario
+  const handleEditUser = () => {
+    // Solo se ejecutará cuando haya exactamente un usuario seleccionado
+    if (selectedUsers.length === 1) {
+      // Encontrar el usuario seleccionado
+      const selectedUser = users.find(user => user._id === selectedUsers[0]);
+      if (selectedUser) {
+        // Navegar a la página de edición pasando el ID como parámetro
+        navigate(`/editar/${selectedUser._id}`);
+      }
+    }
   };
 
   if (loading) {
@@ -113,6 +201,7 @@ function Users() {
                 value={usersPerPage} 
                 onChange={handleUsersPerPageChange}
               >
+                <option value={5}>5</option>
                 <option value={10}>10</option>
                 <option value={20}>20</option>
                 <option value={50}>50</option>
@@ -120,8 +209,37 @@ function Users() {
             </div>
           </div>
 
+          {/* Botones de acción */}
+          <div className="user-actions-container">
+            <button 
+              className="user-action-button create"
+              onClick={() => navigate('/crear')}
+            >
+              <span className="action-icon">+</span>
+              Crear Usuario
+            </button>
+            <button 
+              className={`user-action-button edit ${selectedUsers.length === 1 ? 'active' : 'disabled'}`}
+              disabled={selectedUsers.length !== 1}
+              onClick={handleEditUser}
+            >
+              <span className="action-icon">✎</span>
+              Editar Usuario
+            </button>
+            <button 
+              className={`user-action-button delete ${selectedUsers.length > 0 ? 'active' : 'disabled'}`}
+              disabled={selectedUsers.length === 0 || deleteInProgress}
+              onClick={handleDeleteUsers}
+            >
+              <span className="action-icon">×</span>
+              {deleteInProgress ? 'Eliminando...' : 
+               selectedUsers.length > 1 ? `Eliminar Usuarios (${selectedUsers.length})` : 'Eliminar Usuario'}
+            </button>
+          </div>
+
           <div className="users-list">
             <div className="users-list-header">
+              <div className="user-checkbox-header"></div>
               <div className="user-avatar-header">Avatar</div>
               <div className="user-name-header">Nombre</div>
               <div className="user-username-header">Usuario</div>
@@ -133,6 +251,14 @@ function Users() {
             
             {currentUsers.map((user) => (
               <div className="user-list-item" key={user.id || user._id}>
+                <div className="user-checkbox-cell">
+                  <input
+                    type="checkbox"
+                    checked={selectedUsers.includes(user.id || user._id)}
+                    onChange={() => handleUserSelection(user.id || user._id)}
+                    className="user-checkbox"
+                  />
+                </div>
                 <div className="user-avatar-cell">
                   {user.avatar ? (
                     <img src={user.avatar} alt={`Avatar de ${user.name || user.username}`} />
@@ -223,6 +349,38 @@ function Users() {
             </button>
           </div>
         </>
+      )}
+
+      {/* Modal de confirmación para eliminar usuarios */}
+      {showDeleteConfirmation && (
+        <div className="modal-overlay" onClick={cancelDeleteUsers}>
+          <div className="modal-content delete-confirmation-modal" onClick={(e) => e.stopPropagation()}>
+            <h2>Confirmar eliminación</h2>
+            <p>
+              {selectedUsers.length > 1
+                ? `¿Estás seguro de que deseas eliminar ${selectedUsers.length} usuarios?`
+                : '¿Estás seguro de que deseas eliminar este usuario?'}
+            </p>
+            <p className="warning-text">Esta acción no se puede deshacer.</p>
+            
+            <div className="modal-actions">
+              <button 
+                className="cancel-button" 
+                onClick={cancelDeleteUsers}
+                disabled={deleteInProgress}
+              >
+                Cancelar
+              </button>
+              <button 
+                className="confirm-delete-button"
+                onClick={confirmDeleteUsers}
+                disabled={deleteInProgress}
+              >
+                {deleteInProgress ? 'Eliminando...' : 'Confirmar eliminación'}
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );
