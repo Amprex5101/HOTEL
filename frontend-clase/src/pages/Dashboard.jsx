@@ -209,7 +209,15 @@ function Dashboard() {
     sessionStorage.setItem('bookingInfo', JSON.stringify(bookingInfo));
     
     // Navegar a la página de reserva con el ID del hotel
-    navigate(`/booking/${hotelId}`);
+    navigate(`/reserva/${hotelId}`);
+  };
+
+  const handleViewMore = (hotelId) => {
+    // Store all hotels data in sessionStorage so VerMas can access it
+    sessionStorage.setItem('allHotels', JSON.stringify(allHotels));
+    
+    // Navigate to the VerMas page with the hotel ID
+    navigate(`/ver-mas/${hotelId}`);
   };
 
   return (
@@ -364,7 +372,12 @@ function Dashboard() {
           ) : (
             <div className="hotels-grid">
               {hotels.map(hotel => (
-                <div className="hotel-card" key={hotel.id}>
+                <div 
+                  className="hotel-card" 
+                  key={hotel.id} 
+                  onClick={() => handleViewMore(hotel.id)}
+                  style={{ cursor: 'pointer' }}
+                >
                   <div className="hotel-image">
                     <img src={hotel.image} alt={hotel.name} />
                     <span className="hotel-rating">
@@ -389,7 +402,10 @@ function Dashboard() {
                       </div>
                       <button 
                         className="book-now"
-                        onClick={() => handleBooking(hotel.id)}
+                        onClick={(e) => {
+                          e.stopPropagation(); // Prevent card click when button is clicked
+                          handleBooking(hotel.id);
+                        }}
                       >
                         Reservar
                       </button>

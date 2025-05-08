@@ -7,6 +7,9 @@ import Dashboard from './pages/Dashboard'
 import Usuarios from './pages/Users'
 import ProtectedRoute from './components/ProtectedRoute'
 import Editar from './pages/Editar'
+import VerMas from './pages/VerMas'
+import Reserva from './pages/Reserva'
+
 function App() {
   return (
     <Router>
@@ -30,6 +33,22 @@ function App() {
               <Usuarios />
             </ProtectedRoute>
           } 
+        />
+        <Route 
+          path="/vermas/:id" 
+          element={
+            <ProtectedRoute>
+              <VerMas />
+            </ProtectedRoute>
+          }
+        />
+        <Route 
+          path="/reserva/:id" 
+          element={
+            <ProtectedRoute>
+              <Reserva />
+            </ProtectedRoute>
+          }
         />
         <Route 
           path="/editar/:id" 

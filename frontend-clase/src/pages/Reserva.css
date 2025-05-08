@@ -1,0 +1,823 @@
+/* Reserva Page Styles */
+
+.booking-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 40px;
+  font-family: 'Poppins', 'Helvetica Neue', sans-serif;
+  color: #2c3e50;
+}
+
+.booking-header {
+  margin-bottom: 40px;
+  border-bottom: 1px solid #f0f0f0;
+  padding-bottom: 25px;
+}
+
+.booking-header h1 {
+  font-size: 28px;
+  font-weight: 600;
+  margin: 15px 0 10px;
+  color: #1a2a3a;
+}
+
+.hotel-location {
+  color: #64748b;
+  font-size: 15px;
+  margin: 0;
+}
+
+.back-button {
+  background: transparent;
+  border: none;
+  color: #6772e5;
+  font-size: 16px;
+  cursor: pointer;
+  padding: 8px 0;
+  margin-bottom: 15px;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  font-weight: 500;
+}
+
+.back-button:hover {
+  color: #4f56bf;
+  transform: translateX(-5px);
+}
+
+/* Layout */
+.booking-content {
+  display: grid;
+  grid-template-columns: 1.5fr 1fr;
+  gap: 50px; /* Aumentado para más separación */
+}
+
+/* Form Styles */
+.booking-form-container {
+  grid-column: 1;
+}
+
+.form-section {
+  margin-bottom: 45px;
+  background-color: #ffffff;
+  padding: 35px;
+  border-radius: 12px;
+  box-shadow: 0 3px 15px rgba(0, 0, 0, 0.05);
+}
+
+.form-section h2 {
+  font-size: 22px;
+  margin-top: 0;
+  margin-bottom: 25px; /* Aumentado para más separación */
+  color: #1a2a3a;
+  font-weight: 600;
+}
+
+.service-subtitle {
+  color: #64748b;
+  margin-top: -15px;
+  margin-bottom: 25px;
+  font-size: 14px;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 35px;
+  margin-bottom: 35px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 10px;
+}
+
+.form-group label {
+  font-size: 15px;
+  margin-bottom: 14px;
+  color: #4a5568;
+  font-weight: 500;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+  padding: 16px 20px;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  font-size: 16px;
+  transition: all 0.2s ease;
+  height: auto;
+  line-height: 1.5;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+  border-color: #6772e5;
+  box-shadow: 0 0 0 2px rgba(103, 114, 229, 0.3);
+  outline: none;
+}
+
+.form-group textarea {
+  resize: vertical;
+  min-height: 100px; /* Aumentado para más espacio */
+}
+
+/* Extra Services */
+.extra-services {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px; /* Aumentado para más separación */
+}
+
+.service-option {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px; /* Añadido para separar más las opciones */
+}
+
+.service-option input[type="checkbox"] {
+  margin-right: 12px;
+  width: 20px;
+  height: 20px;
+  accent-color: #6772e5;
+}
+
+.service-option label {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  cursor: pointer;
+  padding: 12px 15px;
+  border-radius: 8px;
+  transition: background-color 0.2s;
+}
+
+.service-option:hover label {
+  background-color: #f8fafc;
+}
+
+.service-name {
+  font-weight: 500;
+  color: #334155;
+}
+
+.service-price {
+  color: #6772e5;
+  font-weight: 600;
+}
+
+/* Booking Summary */
+.booking-summary {
+  grid-column: 2;
+}
+
+.summary-card {
+  background: #ffffff;
+  border-radius: 10px;
+  box-shadow: 0 5px 25px rgba(0, 0, 0, 0.07);
+  padding: 30px;
+}
+
+/* Ventana de confirmación */
+.confirmation-overlay {
+  position: fixed;
+  top: 0;
+  margin-top: 0;
+  margin-bottom: 30px;
+  color: #1a2a3a;
+  text-align: center;
+  font-weight: 600;
+}
+
+.hotel-summary-info {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 30px;
+  padding-bottom: 25px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.hotel-thumbnail {
+  width: 90px;
+  height: 90px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.hotel-summary-info h3 {
+  margin: 0 0 10px 0;
+  font-size: 18px;
+  color: #1a2a3a;
+}
+
+.hotel-summary-info p {
+  margin: 0 0 8px 0;
+  font-size: 15px;
+  color: #64748b;
+}
+
+.hotel-rating {
+  color: #f59e0b;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.summary-details {
+  margin-bottom: 35px;
+}
+
+.summary-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 12px 0;
+  border-bottom: 1px solid #f8fafc;
+}
+
+.summary-item span:first-child {
+  color: #64748b;
+}
+
+.summary-item span:last-child {
+  font-weight: 500;
+  color: #334155;
+}
+
+.price-breakdown {
+  background-color: #f8fafc;
+  padding: 25px;
+  border-radius: 10px;
+  margin-bottom: 35px;
+}
+
+.price-breakdown h3 {
+  margin-top: 0;
+  margin-bottom: 20px;
+  font-size: 18px;
+  color: #1a2a3a;
+}
+
+.price-item {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  font-size: 15px;
+}
+
+.sub-item {
+  margin-left: 15px;
+  color: #64748b;
+}
+
+.price-total {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid #e2e8f0;
+  font-weight: 600;
+  font-size: 20px;
+}
+
+.confirm-booking-button {
+  background: linear-gradient(135deg, #6772e5 0%, #4f56bf 100%);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  padding: 16px 20px;
+  font-size: 17px;
+  font-weight: 600;
+  cursor: pointer;
+  width: 100%;
+  margin-bottom: 15px;
+  transition: all 0.3s ease;
+  box-shadow: 0 5px 15px rgba(103, 114, 229, 0.3);
+}
+
+.confirm-booking-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(103, 114, 229, 0.4);
+}
+
+.confirm-booking-button:disabled {
+  background: #94a3b8;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.booking-note {
+  color: #94a3b8;
+  font-size: 13px;
+  line-height: 1.6;
+  text-align: center;
+}
+
+/* Loading/Error States */
+.loading, .error-message {
+  text-align: center;
+  padding: 120px 0;
+  font-size: 18px;
+  color: #64748b;
+}
+
+.error-message {
+  color: #e53e3e;
+}
+
+/* Ventana de confirmación */
+.confirmation-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  backdrop-filter: blur(5px);
+}
+
+.confirmation-modal {
+  background: white;
+  border-radius: 12px;
+  width: 90%;
+  max-width: 900px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+  animation: modalFadeIn 0.4s;
+}
+
+@keyframes modalFadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.confirmation-header {
+  background: linear-gradient(135deg, #6772e5 0%, #4f56bf 100%);
+  color: white;
+  padding: 25px 30px;
+  border-radius: 12px 12px 0 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.confirmation-header h2 {
+  margin: 0;
+  font-size: 24px;
+}
+
+.reservation-number {
+  font-size: 16px;
+  background-color: rgba(255, 255, 255, 0.2);
+  padding: 8px 15px;
+  border-radius: 20px;
+}
+
+.confirmation-content {
+  padding: 30px;
+}
+
+.confirmation-hotel {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 30px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.confirmation-hotel img {
+  width: 100px;
+  height: 100px;
+  object-fit: cover;
+  border-radius: 10px;
+}
+
+.confirmation-hotel h3 {
+  margin: 5px 0 10px 0;
+  font-size: 20px;
+}
+
+.confirmation-hotel p {
+  color: #64748b;
+  margin: 0;
+}
+
+.confirmation-row {
+  display: flex;
+  gap: 40px;
+  margin-bottom: 30px;
+}
+
+.confirmation-column {
+  flex: 1;
+}
+
+.confirmation-column h4, 
+.confirmation-services h4, 
+.confirmation-price h4,
+.confirmation-requests h4 {
+  color: #4f56bf;
+  font-size: 18px;
+  margin-bottom: 15px;
+  margin-top: 0;
+  border-bottom: 1px solid #f0f0f0;
+  padding-bottom: 10px;
+}
+
+.confirmation-column p, 
+.confirmation-requests p {
+  margin: 10px 0;
+  line-height: 1.6;
+}
+
+.confirmation-services {
+  margin-bottom: 25px;
+}
+
+.confirmation-services ul {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+
+.confirmation-services li {
+  background-color: #f8fafc;
+  padding: 10px 15px;
+  border-radius: 6px;
+  font-size: 14px;
+}
+
+.confirmation-price {
+  background-color: #f0f4f8;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  margin-bottom: 25px;
+}
+
+.confirmation-price .price {
+  font-size: 28px;
+  font-weight: bold;
+  color: #1a2a3a;
+}
+
+.confirmation-actions {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+.download-button, .close-button {
+  flex: 1;
+  padding: 15px;
+  border-radius: 8px;
+  border: none;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 16px;
+}
+
+.download-button {
+  background-color: #6772e5;
+  color: white;
+}
+
+.download-button:hover {
+  background-color: #4f56bf;
+}
+
+.close-button {
+  background-color: #f8fafc;
+  color: #64748b;
+  border: 1px solid #e2e8f0;
+}
+
+.close-button:hover {
+  background-color: #f0f4f8;
+}
+
+.confirmation-note {
+  text-align: center;
+  color: #64748b;
+  font-size: 14px;
+  margin-bottom: 0;
+}
+
+/* Estilos para el formulario de pago */
+.payment-modal {
+  background: white;
+  border-radius: 12px;
+  width: 90%;
+  max-width: 600px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+  animation: modalFadeIn 0.4s;
+}
+
+.payment-header {
+  background: linear-gradient(135deg, #2A4365 0%, #1A365D 100%);
+  color: white;
+  padding: 20px 30px;
+  border-radius: 12px 12px 0 0;
+}
+
+.payment-header h2 {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 600;
+}
+
+.payment-content {
+  padding: 30px;
+}
+
+.reservation-summary {
+  margin-bottom: 25px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.reservation-summary h3 {
+  margin: 0 0 15px 0;
+  font-size: 18px;
+  color: #1a2a3a;
+}
+
+.summary-key-details {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 15px;
+  font-size: 14px;
+}
+
+.payment-amount {
+  background-color: #f0f9ff;
+  padding: 12px 15px;
+  border-radius: 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 15px;
+}
+
+.payment-amount .amount {
+  font-size: 20px;
+  font-weight: 700;
+  color: #1a2a3a;
+}
+
+.payment-form {
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+}
+
+.payment-card {
+  background-color: #f8fafc;
+  padding: 20px 25px;
+  border-radius: 10px;
+  border: 1px solid #e2e8f0;
+}
+
+.payment-card .form-group {
+  margin-bottom: 15px;
+}
+
+.payment-card label {
+  display: block;
+  font-size: 14px;
+  margin-bottom: 8px;
+  color: #4a5568;
+}
+
+.payment-card input {
+  width: 100%;
+  padding: 12px 15px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 15px;
+  transition: all 0.2s;
+}
+
+.payment-card input:focus {
+  border-color: #3182ce;
+  box-shadow: 0 0 0 3px rgba(49, 130, 206, 0.2);
+  outline: none;
+}
+
+.error {
+  color: #e53e3e;
+  font-size: 12px;
+  margin-top: 5px;
+  display: block;
+}
+
+.card-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+}
+
+.payment-actions {
+  display: flex;
+  gap: 15px;
+}
+
+.payment-actions button {
+  flex: 1;
+  padding: 14px;
+  border-radius: 8px;
+  border: none;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 16px;
+  transition: all 0.2s;
+}
+
+.cancel-payment {
+  background-color: #f7fafc;
+  border: 1px solid #e2e8f0 !important;
+  color: #4a5568;
+}
+
+.cancel-payment:hover {
+  background-color: #edf2f7;
+}
+
+.process-payment {
+  background: linear-gradient(135deg, #3182ce 0%, #2b6cb0 100%);
+  color: white;
+}
+
+.process-payment:hover {
+  background: linear-gradient(135deg, #2b6cb0 0%, #2c5282 100%);
+}
+
+.payment-secure-note {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  color: #718096;
+  font-size: 13px;
+}
+
+.secure-icon {
+  font-size: 16px;
+}
+
+/* Estilos para el estado de procesamiento */
+.payment-processing {
+  text-align: center;
+  padding: 40px 0;
+}
+
+.loader {
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #3182ce;
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  animation: spin 2s linear infinite;
+  margin: 0 auto 20px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Estilos para el mensaje de éxito */
+.payment-success {
+  text-align: center;
+  padding: 40px 0;
+}
+
+.success-icon {
+  background: #48BB78;
+  color: white;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 30px;
+  margin: 0 auto 20px;
+}
+
+.payment-success h3 {
+  color: #2F855A;
+  margin-bottom: 10px;
+}
+
+.payment-success p {
+  color: #718096;
+}
+
+/* Responsive para móviles */
+@media (max-width: 480px) {
+  .payment-modal {
+    width: 95%;
+  }
+  
+  .card-row {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+  
+  .payment-actions {
+    flex-direction: column;
+  }
+  
+  .summary-key-details {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .booking-content {
+    grid-template-columns: 1fr;
+  }
+  
+  .booking-summary {
+    grid-column: 1;
+    margin-top: 30px;
+  }
+  
+  .form-row,
+  .extra-services {
+    grid-template-columns: 1fr;
+  }
+  
+  .summary-card {
+    position: static;
+  }
+  
+  .confirmation-row {
+    flex-direction: column;
+    gap: 20px;
+  }
+  
+  .confirmation-services ul {
+    grid-template-columns: 1fr;
+  }
+  
+  .confirmation-actions {
+    flex-direction: column;
+  }
+
+  .form-row {
+    grid-template-columns: 1fr;
+    gap: 25px;
+  }
+  
+  /* Para móviles, hacer los inputs aún más grandes */
+  .form-group input,
+  .form-group select,
+  .form-group textarea {
+    padding: 18px 20px;
+    font-size: 16px;
+  }
+  
+  /* Más espacio en vertical entre elementos */
+  .form-section {
+    padding: 25px;
+    margin-bottom: 30px;
+  }
+}
+
+/* Para pantallas muy pequeñas */
+@media (max-width: 480px) {
+  .form-group input,
+  .form-group select,
+  .form-group textarea {
+    width: 100%;
+    box-sizing: border-box;
+  }
+  
+  .form-section {
+    padding: 20px;
+  }
+}
+
+/* Mejorar el espaciado para los campos de fecha (checkIn, checkOut) */
+.dates .form-group input {
+  width: 100%;
+  box-sizing: border-box;
+}

@@ -11,6 +11,8 @@ import Users from './pages/Users.jsx'
 import ProtectedRoute from './components/ProtectedRoute.jsx'
 import Editar from './pages/Editar.jsx'
 import Crear from './pages/Crear.jsx'
+import VerMas from './pages/VerMas.jsx'
+import Reserva from './pages/Reserva.jsx'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
@@ -23,10 +25,13 @@ createRoot(document.getElementById('root')).render(
             <Route path='/register' element={<Register />} />
             {/* Rutas protegidas */}
             <Route element={<ProtectedRoute />}>
-              <Route path='/dashboard' element={<Dashboard />} /> 
+              <Route path='/dashboard' element={<Dashboard />} />
+              <Route path='/ver-mas/:id' element={<VerMas />} />
+              {/* Puedes agregar más rutas protegidas aquí */}
               <Route path='/users' element={<Users />} /> 
               <Route path="/editar/:id" element={<Editar />} />
               <Route path="/crear" element={<Crear />} />
+              <Route path="/reserva/:id" element={<Reserva />} />
               {/* Puedes agregar más rutas protegidas aquí */}
             </Route>
           </Route>
