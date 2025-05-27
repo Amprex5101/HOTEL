@@ -1,0 +1,27 @@
+{
+  "name": "hotel-management-system",
+  "version": "1.0.0",
+  "description": "Sistema completo de gestión de hotel con frontend y backend",
+  "private": true,
+  "workspaces": [
+    "frontend-clase",
+    "backend-clase"
+  ],
+  "scripts": {
+    "start": "concurrently --names \"BACKEND,FRONTEND\" --prefix-colors \"blue,green\" --kill-others \"npm run start:backend\" \"npm run start:frontend\"",
+    "dev": "concurrently --names \"BACKEND,FRONTEND\" --prefix-colors \"blue,green\" --kill-others \"npm run dev:backend\" \"npm run dev:frontend\"",
+    "start:frontend": "cd frontend-clase && npm start",
+    "start:backend": "cd backend-clase && npm start",
+    "dev:frontend": "cd frontend-clase && npm run dev",
+    "dev:backend": "cd backend-clase && npm run dev",
+    "install:all": "npm install && npm install --workspace=frontend-clase && npm install --workspace=backend-clase",
+    "clean": "rimraf node_modules && rimraf frontend-clase/node_modules && rimraf backend-clase/node_modules"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2",
+    "rimraf": "^5.0.5"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  }
+}

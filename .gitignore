@@ -1,0 +1,27 @@
+# Dependencias
+/node_modules
+/frontend-clase/node_modules
+/backend-clase/node_modules
+
+# Archivos de entorno
+.env
+/backend-clase/.env
+
+# Archivos de compilación
+/frontend-clase/dist
+/frontend-clase/build
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Archivos del editor
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Archivos del sistema
+.DS_Store
+Thumbs.db

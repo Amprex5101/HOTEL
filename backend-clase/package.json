@@ -1,5 +1,5 @@
 {
-  "name": "backend-clase",
+  "name": "hotel-backend",
   "version": "1.0.0",
   "description": "Backend with MongoDB Atlas authentication",
   "main": "src/server.js",
