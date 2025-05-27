@@ -3,6 +3,9 @@ import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import './Editar.css';
 
+// Usar la variable de entorno para la URL base de la API
+const API_BASE_URL = import.meta.env.VITE_API_URL;
+
 function Editar() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -26,7 +29,7 @@ function Editar() {
     const fetchUser = async () => {
       try {
         setLoading(true);
-        const response = await axios.get(`http://localhost:3000/api/users/${id}`);
+        const response = await axios.get(`${API_BASE_URL}/users/${id}`);
         
         // Llenar el formulario con los datos del usuario
         setFormData({
@@ -65,8 +68,8 @@ function Editar() {
       setSaving(true);
       setError(null);
       
-      // Enviar datos actualizados al servidor
-      await axios.put(`http://localhost:3000/api/users/${id}`, formData);
+      // Enviar datos actualizados al servidor usando la variable de entorno
+      await axios.put(`${API_BASE_URL}/users/${id}`, formData);
       
       setSuccessMessage('Usuario actualizado correctamente');
       

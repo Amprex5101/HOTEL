@@ -4,6 +4,9 @@ import { useAuth } from '../context/AuthContext';
 import axios from 'axios';
 import './CrearHotel.css';
 
+// Usar la variable de entorno para la URL base de la API
+const API_BASE_URL = import.meta.env.VITE_API_URL;
+
 function CrearHotel() {
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -28,7 +31,7 @@ function CrearHotel() {
     'Bicicletas gratuitas'
   ]);
   
-    // Añade esto al estado detailsData
+  // Añade esto al estado detailsData
   const [detailsData, setDetailsData] = useState({
     hotelId: '',
     description: '',
@@ -57,7 +60,7 @@ function CrearHotel() {
     // Obtener el último ID de hotel para incrementarlo
     const fetchLastHotelId = async () => {
       try {
-        const response = await axios.get('http://localhost:3000/api/hotels');
+        const response = await axios.get(`${API_BASE_URL}/hotels`);
         if (response.data && response.data.length > 0) {
           // Encontrar el ID más alto
           const maxId = Math.max(...response.data.map(hotel => hotel.id));
@@ -208,11 +211,11 @@ function CrearHotel() {
       };
       
       // Primero guardar el hotel básico
-      const hotelResponse = await axios.post('http://localhost:3000/api/hotels', hotelData);
+      const hotelResponse = await axios.post(`${API_BASE_URL}/hotels`, hotelData);
       
       if (hotelResponse.status === 201) {
         // Luego guardar los detalles del hotel
-        const hotelDetailResponse = await axios.post('http://localhost:3000/api/hotel-details', {
+        const hotelDetailResponse = await axios.post(`${API_BASE_URL}/hotel-details`, {
           ...detailsData,
           hotelId: detailsData.hotelId
         });

@@ -3,6 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import './Dashboard.css';
 
+// Usar la variable de entorno para la URL base de la API
+const API_BASE_URL = import.meta.env.VITE_API_URL;
+
 function Dashboard() {
   const navigate = useNavigate();
   
@@ -40,8 +43,8 @@ function Dashboard() {
         setLoading(true);
         setError(null);
         
-        // Hacer la petición al backend para obtener todos los hoteles
-        const response = await axios.get('http://localhost:3000/api/hotels');
+        // Hacer la petición al backend para obtener todos los hoteles usando la variable de entorno
+        const response = await axios.get(`${API_BASE_URL}/hotels`);
         
         // Actualizar estados con los datos recibidos
         setAllHotels(response.data);
@@ -121,8 +124,8 @@ function Dashboard() {
       }
       params.append('guests', searchParams.guests);
       
-      // Hacer la petición al backend para buscar hoteles según criterios
-      const response = await axios.get(`http://localhost:3000/api/hotels/search?${params.toString()}`);
+      // Hacer la petición al backend para buscar hoteles según criterios usando la variable de entorno
+      const response = await axios.get(`${API_BASE_URL}/hotels/search?${params.toString()}`);
       
       setHotels(response.data);
       

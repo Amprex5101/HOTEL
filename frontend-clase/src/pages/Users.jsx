@@ -3,6 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import './Users.css';
 
+// Usar la variable de entorno para la URL base de la API
+const API_BASE_URL = import.meta.env.VITE_API_URL;
+
 function Users() {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -24,8 +27,8 @@ function Users() {
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        // Obtener TODOS los usuarios de la base de datos
-        const response = await axios.get('http://localhost:3000/api/users');
+        // Obtener TODOS los usuarios de la base de datos usando la variable de entorno
+        const response = await axios.get(`${API_BASE_URL}/users`);
         setUsers(response.data);
         setLoading(false);
       } catch (err) {
@@ -91,12 +94,13 @@ function Users() {
       
       // Si hay varios usuarios seleccionados, hacer una solicitud por lotes
       if (selectedUsers.length > 1) {
-        await axios.delete('http://localhost:3000/api/users/batch', {
+        // Usar la variable de entorno
+        await axios.delete(`${API_BASE_URL}/users/batch`, {
           data: { userIds: selectedUsers }
         });
       } else {
-        // Si es un solo usuario, hacer una solicitud individual
-        await axios.delete(`http://localhost:3000/api/users/${selectedUsers[0]}`);
+        // Si es un solo usuario, hacer una solicitud individual usando la variable de entorno
+        await axios.delete(`${API_BASE_URL}/users/${selectedUsers[0]}`);
       }
       
       // Actualizar la lista de usuarios (eliminar los seleccionados del estado local)

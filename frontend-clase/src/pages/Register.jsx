@@ -1,8 +1,11 @@
-import React, { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
-import './Register.css'
-import ErrorForm from '../components/ErrorForm'
-import { useAuth } from '../context/AuthContext'
+import React, { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import './Register.css';
+import ErrorForm from '../components/ErrorForm';
+import { useAuth } from '../context/AuthContext';
+
+// Usar la variable de entorno para la URL base de la API
+const API_BASE_URL = import.meta.env.VITE_API_URL;
 
 function Register() {
   const navigate = useNavigate();
@@ -165,7 +168,7 @@ function Register() {
         </form>
       </div>
     </div>
-  )
+  );
 }
 
-export default Register
+export default Register;

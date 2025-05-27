@@ -2,6 +2,9 @@ import React, { createContext, useState, useContext, useEffect } from 'react';
 import { authService } from '../services/authService';
 import axios from 'axios';
 
+// Usar la variable de entorno para la URL base de la API
+const API_BASE_URL = import.meta.env.VITE_API_URL;
+
 const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
@@ -45,7 +48,8 @@ export const AuthProvider = ({ children }) => {
     const register = async (username, password, name, email) => {
         try {
             setError(null);
-            const response = await axios.post('http://localhost:3000/api/register', {
+            // Usar la variable de entorno en lugar de la URL hardcodeada
+            const response = await axios.post(`${API_BASE_URL}/register`, {
                 username,
                 password,
                 name,

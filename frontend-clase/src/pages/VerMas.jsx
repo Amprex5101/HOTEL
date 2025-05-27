@@ -3,6 +3,9 @@ import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import './VerMas.css';
 
+// Usar la variable de entorno para la URL base de la API
+const API_BASE_URL = import.meta.env.VITE_API_URL;
+
 function VerMas() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -18,16 +21,16 @@ function VerMas() {
         setLoading(true);
         setError(null);
         
-        // Obtener información básica del hotel
-        const hotelResponse = await axios.get(`http://localhost:3000/api/hotels/${id}`);
+        // Obtener información básica del hotel usando la variable de entorno
+        const hotelResponse = await axios.get(`${API_BASE_URL}/hotels/${id}`);
         if (!hotelResponse.data) {
           throw new Error('Hotel no encontrado');
         }
         setHotel(hotelResponse.data);
         
-        // Obtener detalles extendidos del hotel
+        // Obtener detalles extendidos del hotel usando la variable de entorno
         // Ahora buscamos por hotelId que es un número en tu base de datos
-        const detailResponse = await axios.get(`http://localhost:3000/api/hotel-details?hotelId=${id}`);
+        const detailResponse = await axios.get(`${API_BASE_URL}/hotel-details?hotelId=${id}`);
         if (detailResponse.data) {
           setHotelDetail(detailResponse.data);
         }
@@ -46,7 +49,11 @@ function VerMas() {
   const nextImage = () => {
     if (hotelDetail && hotelDetail.additionalImages && hotelDetail.additionalImages.length > 0) {
       setCurrentImageIndex((prevIndex) => 
-        prevIndex === hotelDetail.additionalImages.length - 1 ? 0 : prevIndex + 1
+        prevIndex === allImages.length - 1 ? 0 : prevIndex + 1
+      );
+    } else if (allImages.length > 1) {
+      setCurrentImageIndex((prevIndex) => 
+        prevIndex === allImages.length - 1 ? 0 : prevIndex + 1
       );
     }
   };
@@ -54,7 +61,11 @@ function VerMas() {
   const prevImage = () => {
     if (hotelDetail && hotelDetail.additionalImages && hotelDetail.additionalImages.length > 0) {
       setCurrentImageIndex((prevIndex) => 
-        prevIndex === 0 ? hotelDetail.additionalImages.length - 1 : prevIndex - 1
+        prevIndex === 0 ? allImages.length - 1 : prevIndex - 1
+      );
+    } else if (allImages.length > 1) {
+      setCurrentImageIndex((prevIndex) => 
+        prevIndex === 0 ? allImages.length - 1 : prevIndex - 1
       );
     }
   };
@@ -100,8 +111,8 @@ function VerMas() {
   }
 
   // Determinar qué imágenes mostrar (imagen principal + adicionales)
-  const allImages = hotelDetail?.additionalImages ? 
-    [hotel.image, ...hotelDetail.additionalImages] : 
+  const allImages = hotelDetail?.additionalImages && hotelDetail.additionalImages.length > 0 ? 
+    [hotel.image, ...hotelDetail.additionalImages.filter(img => img)] : 
     [hotel.image];
   
   const mainImage = allImages[currentImageIndex];

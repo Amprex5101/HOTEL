@@ -3,6 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import './Crear.css';
 
+// Usar la variable de entorno para la URL base de la API
+const API_BASE_URL = import.meta.env.VITE_API_URL;
+
 function Crear() {
   const navigate = useNavigate();
   
@@ -44,8 +47,8 @@ function Crear() {
       setLoading(true);
       setError(null);
       
-      // Enviar datos al servidor
-      await axios.post('http://localhost:3000/api/users', {
+      // Enviar datos al servidor usando la variable de entorno
+      await axios.post(`${API_BASE_URL}/users`, {
         username: formData.username,
         password: formData.password,
         name: formData.name,

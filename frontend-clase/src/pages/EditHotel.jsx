@@ -4,6 +4,9 @@ import { useAuth } from '../context/AuthContext';
 import axios from 'axios';
 import './EditHotel.css';
 
+// Usar la variable de entorno para la URL base de la API
+const API_BASE_URL = import.meta.env.VITE_API_URL;
+
 function EditHotel() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -42,7 +45,8 @@ function EditHotel() {
     const fetchHotelData = async () => {
       try {
         setLoading(true);
-        const response = await axios.get(`http://localhost:3000/api/hotels/${id}`);
+        // Usar la variable de entorno en lugar de la URL hardcodeada
+        const response = await axios.get(`${API_BASE_URL}/hotels/${id}`);
         
         if (response.data) {
           setFormData({
@@ -115,7 +119,8 @@ function EditHotel() {
       setSaving(true);
       setError(null);
       
-      await axios.put(`http://localhost:3000/api/hotels/${id}`, formData);
+      // Usar la variable de entorno en lugar de la URL hardcodeada
+      await axios.put(`${API_BASE_URL}/hotels/${id}`, formData);
       
       setSuccessMessage('Hotel actualizado correctamente');
       

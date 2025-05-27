@@ -3,6 +3,9 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import './HotelsAdmin.css';
 
+// Usar la variable de entorno para la URL base de la API
+const API_BASE_URL = import.meta.env.VITE_API_URL;
+
 function HotelsAdmin() {
   const [hotels, setHotels] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -24,8 +27,8 @@ function HotelsAdmin() {
   const fetchHotels = async () => {
     try {
       setLoading(true);
-      // Llamar a la API para obtener los hoteles
-      const response = await fetch('http://localhost:3000/api/hotels');
+      // Llamar a la API para obtener los hoteles usando la variable de entorno
+      const response = await fetch(`${API_BASE_URL}/hotels`);
       
       if (!response.ok) {
         throw new Error('Error al cargar hoteles');
@@ -66,7 +69,7 @@ function HotelsAdmin() {
       
       return () => clearTimeout(timer);
     }
-  }, [location.pathname, location.state]);
+  }, [location.pathname, location.state, navigate]);
 
   // Filtrado de hoteles por nombre o ubicación
   const filteredHotels = hotels.filter(hotel => 
@@ -134,7 +137,8 @@ function HotelsAdmin() {
       for (const hotelId of selectedHotels) {
         // Primero eliminar los detalles del hotel
         try {
-          await fetch(`http://localhost:3000/api/hotel-details/${hotelId}`, {
+          // Usar la variable de entorno
+          await fetch(`${API_BASE_URL}/hotel-details/${hotelId}`, {
             method: 'DELETE',
           });
           console.log(`Detalles del hotel ${hotelId} eliminados correctamente`);
@@ -144,7 +148,8 @@ function HotelsAdmin() {
         }
         
         // Luego eliminar el hotel principal
-        const response = await fetch(`http://localhost:3000/api/hotels/${hotelId}`, {
+        // Usar la variable de entorno
+        const response = await fetch(`${API_BASE_URL}/hotels/${hotelId}`, {
           method: 'DELETE',
         });
         
