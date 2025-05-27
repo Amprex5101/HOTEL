@@ -1,69 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 import './Dashboard.css';
 
 function Dashboard() {
   const navigate = useNavigate();
   
-  // Estado original de todos los hoteles (como base de datos)
-  const [allHotels, setAllHotels] = useState([
-    {
-      id: 1,
-      name: "Grand Hotel Luxury",
-      location: "Centro Histórico, Ciudad",
-      rating: 4.8,
-      price: 2800,
-      image: "https://images.unsplash.com/photo-1566073771259-6a8506099945?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80",
-      amenities: ["Wi-Fi", "Piscina", "Spa", "Restaurante", "Gimnasio"]
-    },
-    {
-      id: 2,
-      name: "Boutique Hotel Marina",
-      location: "Zona Costera, Ciudad",
-      rating: 4.6,
-      price: 2200,
-      image: "https://images.unsplash.com/photo-1618773928121-c32242e63f39?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80",
-      amenities: ["Wi-Fi", "Piscina", "Vista al mar", "Desayuno incluido"]
-    },
-    {
-      id: 3,
-      name: "Business Plaza Hotel",
-      location: "Distrito Financiero, Ciudad",
-      rating: 4.4,
-      price: 1950,
-      image: "https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80",
-      amenities: ["Wi-Fi", "Centro de negocios", "Restaurante", "Transporte al aeropuerto"]
-    },
-    {
-      id: 4,
-      name: "Resort & Spa Paradise",
-      location: "Playa Hermosa, Ciudad",
-      rating: 4.9,
-      price: 3500,
-      image: "https://images.unsplash.com/photo-1571003123894-1f0594d2b5d9?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1349&q=80",
-      amenities: ["Wi-Fi", "Piscina infinita", "Spa de lujo", "Actividades acuáticas", "Todo incluido"]
-    },
-    // Nuevos hoteles
-    {
-      id: 5,
-      name: "Mountain View Lodge",
-      location: "Sierra Alta, Ciudad",
-      rating: 4.7,
-      price: 2600,
-      image: "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80",
-      amenities: ["Wi-Fi", "Chimenea", "Vistas panorámicas", "Desayuno gourmet", "Senderismo"]
-    },
-    {
-      id: 6,
-      name: "Urban Design Suites",
-      location: "Zona Cultural, Ciudad",
-      rating: 4.5,
-      price: 2100,
-      image: "https://images.unsplash.com/photo-1611892440504-42a792e24d32?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80",
-      amenities: ["Wi-Fi", "Terraza en azotea", "Bar de diseñador", "Galería de arte", "Bicicletas gratuitas"]
-    }
-  ]);
-
+  // Estado para los hoteles obtenidos de la API
+  const [allHotels, setAllHotels] = useState([]);
+  
   // Estado para los hoteles filtrados que se mostrarán
   const [hotels, setHotels] = useState([]);
   
@@ -84,12 +29,42 @@ function Dashboard() {
   });
 
   // Estado para mensajes y carga
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [message, setMessage] = useState('');
 
-  // Inicializar hoteles al cargar
+  // Cargar hoteles al inicializar el componente
   useEffect(() => {
-    setHotels(allHotels);
+    const fetchHotels = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        
+        // Hacer la petición al backend para obtener todos los hoteles
+        const response = await axios.get('http://localhost:3000/api/hotels');
+        
+        // Actualizar estados con los datos recibidos
+        setAllHotels(response.data);
+        setHotels(response.data);
+        
+        // Configurar filtro de precio máximo basado en los hoteles disponibles
+        if (response.data.length > 0) {
+          const maxPrice = Math.max(...response.data.map(hotel => hotel.price));
+          setFilters(prev => ({
+            ...prev,
+            priceRange: [0, maxPrice]
+          }));
+        }
+        
+      } catch (err) {
+        console.error("Error al obtener hoteles:", err);
+        setError("No se pudieron cargar los hoteles. Por favor intenta de nuevo más tarde.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchHotels();
   }, []);
 
   // Manejar cambios en el formulario de búsqueda
@@ -127,36 +102,48 @@ function Dashboard() {
   };
 
   // Función principal de búsqueda
-  const handleSearch = (e) => {
+  const handleSearch = async (e) => {
     e.preventDefault();
     setLoading(true);
     setMessage('');
     
-    // Simulamos una búsqueda con un pequeño retraso
-    setTimeout(() => {
-      const filteredResults = allHotels.filter(hotel => {
-        // Filtrar por destino (si se especificó)
-        if (searchParams.destination && 
-            !hotel.location.toLowerCase().includes(searchParams.destination.toLowerCase())) {
-          return false;
-        }
-        return true;
-      });
+    try {
+      // Preparar los parámetros de búsqueda para la consulta
+      const params = new URLSearchParams();
+      if (searchParams.destination) {
+        params.append('location', searchParams.destination);
+      }
+      if (searchParams.checkIn) {
+        params.append('checkIn', searchParams.checkIn);
+      }
+      if (searchParams.checkOut) {
+        params.append('checkOut', searchParams.checkOut);
+      }
+      params.append('guests', searchParams.guests);
       
-      setHotels(filteredResults);
-      setLoading(false);
+      // Hacer la petición al backend para buscar hoteles según criterios
+      const response = await axios.get(`http://localhost:3000/api/hotels/search?${params.toString()}`);
       
-      if (filteredResults.length === 0) {
+      setHotels(response.data);
+      
+      if (response.data.length === 0) {
         setMessage('No se encontraron hoteles con los criterios especificados.');
       }
-    }, 800); // Simular tiempo de búsqueda
+    } catch (err) {
+      console.error("Error en la búsqueda:", err);
+      setMessage("Ocurrió un error al buscar hoteles. Por favor intenta de nuevo.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   // Función para aplicar filtros
   const applyFilters = () => {
     setLoading(true);
+    setMessage('');
     
-    setTimeout(() => {
+    try {
+      // Filtrar los hoteles localmente basado en los filtros seleccionados
       const filteredResults = allHotels.filter(hotel => {
         // Filtrar por precio
         if (hotel.price < filters.priceRange[0] || hotel.price > filters.priceRange[1]) {
@@ -172,7 +159,7 @@ function Dashboard() {
         if (filters.amenities.length > 0) {
           // Verificar que el hotel tenga TODAS las amenidades seleccionadas
           const hasAllAmenities = filters.amenities.every(amenity => 
-            hotel.amenities.includes(amenity)
+            hotel.amenities?.includes(amenity)
           );
           if (!hasAllAmenities) {
             return false;
@@ -184,19 +171,21 @@ function Dashboard() {
       });
       
       setHotels(filteredResults);
-      setLoading(false);
       
       if (filteredResults.length === 0) {
         setMessage('No se encontraron hoteles con los filtros aplicados.');
-      } else {
-        setMessage('');
       }
-    }, 500);
+    } catch (err) {
+      console.error("Error al aplicar filtros:", err);
+      setMessage("Ocurrió un error al aplicar los filtros. Por favor intenta de nuevo.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   // Función para reservar hotel
   const handleBooking = (hotelId) => {
-    // Aquí podrías guardar la información de búsqueda en sessionStorage o en un estado global
+    // Guardar información de búsqueda en sessionStorage para la página de reserva
     const bookingInfo = {
       hotelId,
       checkIn: searchParams.checkIn,
@@ -205,7 +194,6 @@ function Dashboard() {
       rooms: searchParams.rooms
     };
     
-    // Guardar en sessionStorage para usar en la página de reserva
     sessionStorage.setItem('bookingInfo', JSON.stringify(bookingInfo));
     
     // Navegar a la página de reserva con el ID del hotel
@@ -213,15 +201,18 @@ function Dashboard() {
   };
 
   const handleViewMore = (hotelId) => {
-    // Store all hotels data in sessionStorage so VerMas can access it
-    sessionStorage.setItem('allHotels', JSON.stringify(allHotels));
-    
-    // Navigate to the VerMas page with the hotel ID
+    // Usar el API para obtener los detalles específicos del hotel
     navigate(`/ver-mas/${hotelId}`);
   };
 
   return (
     <div className="dashboard-container">
+      {error && (
+        <div className="error-banner">
+          <p>{error}</p>
+          <button onClick={() => setError(null)}>Cerrar</button>
+        </div>
+      )}
     
       <div className="search-section">
         <h1>Encuentra el hotel ideal para tu próxima estancia</h1>
@@ -366,7 +357,10 @@ function Dashboard() {
         {/* Listado de hoteles */}
         <div className="hotels-container">
           {loading ? (
-            <div className="loading-message">Buscando los mejores hoteles para ti...</div>
+            <div className="loading-message">
+              <div className="spinner"></div>
+              <p>Buscando los mejores hoteles para ti...</p>
+            </div>
           ) : message ? (
             <div className="no-results">{message}</div>
           ) : (
@@ -388,10 +382,10 @@ function Dashboard() {
                     <h3>{hotel.name}</h3>
                     <p className="hotel-location">{hotel.location}</p>
                     <div className="hotel-amenities">
-                      {hotel.amenities.slice(0, 3).map((amenity, index) => (
+                      {hotel.amenities?.slice(0, 3).map((amenity, index) => (
                         <span key={index} className="amenity-tag">{amenity}</span>
                       ))}
-                      {hotel.amenities.length > 3 && (
+                      {hotel.amenities?.length > 3 && (
                         <span className="amenity-tag more">+{hotel.amenities.length - 3} más</span>
                       )}
                     </div>

@@ -801,6 +801,114 @@
     margin-bottom: 30px;
   }
 }
+/* Añade estos estilos a tu archivo Reserva.css */
+
+/* Estilos para la información de políticas del hotel */
+.hotel-policy-info {
+  margin-top: 20px;
+  padding: 15px;
+  background-color: #f8f9fa;
+  border-radius: 6px;
+  border-left: 3px solid #3498db;
+}
+
+.hotel-policy-info h3 {
+  font-size: 16px;
+  margin-top: 0;
+  margin-bottom: 10px;
+  color: #2c3e50;
+}
+
+.checkin-checkout-times {
+  display: flex;
+  justify-content: space-between;
+}
+
+.time-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 5px 15px;
+}
+
+.time-item span {
+  font-size: 12px;
+  color: #7f8c8d;
+  margin-bottom: 3px;
+}
+
+.time-item strong {
+  font-size: 16px;
+  color: #2c3e50;
+}
+
+/* Estilos para los estados de carga */
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 50px 20px;
+  text-align: center;
+}
+
+.error-container {
+  max-width: 500px;
+  margin: 50px auto;
+  text-align: center;
+  padding: 30px;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.error-container h2 {
+  color: #e74c3c;
+  margin-bottom: 15px;
+}
+
+.error-container p {
+  margin-bottom: 20px;
+  color: #666;
+}
+
+/* Mejoras para el spinner */
+.spinner {
+  display: inline-block;
+  width: 50px;
+  height: 50px;
+  border: 3px solid rgba(0, 0, 0, 0.1);
+  border-radius: 50%;
+  border-top-color: #3498db;
+  animation: spin 1s ease-in-out infinite;
+  margin-bottom: 20px;
+}
+.api-error-message {
+  background-color: #ffebee;
+  color: #c62828;
+  padding: 15px;
+  border-radius: 4px;
+  margin-bottom: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.api-error-message button {
+  background-color: #c62828;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.api-error-message button:hover {
+  background-color: #b71c1c;
+}
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
 
 /* Para pantallas muy pequeñas */
 @media (max-width: 480px) {

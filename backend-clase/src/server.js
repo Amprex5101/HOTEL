@@ -26,11 +26,19 @@ connectDB();
 
 // Importar rutas
 const authRoutes = require('./routes/authRoutes');
-const userRoutes = require('./routes/userRoutes'); // Importar las nuevas rutas
+const userRoutes = require('./routes/userRoutes');
+const hotelRoutes = require('./routes/hotelRoutes');
+const hotelDetailRoutes = require('./routes/hotelDetailRoutes');
+const roomRoutes = require('./routes/roomRoutes');
+const reservaRoutes = require('./routes/reservaRoutes'); // Importar rutas de reserva
 
 // Usar rutas
+app.use('/api', hotelRoutes);
 app.use('/api', authRoutes);
-app.use('/api', userRoutes); // Usar las rutas de usuarios
+app.use('/api', userRoutes);
+app.use('/api', hotelDetailRoutes);
+app.use('/api', roomRoutes);
+app.use('/api', reservaRoutes); // Usar rutas de reserva
 
 // Ruta principal
 app.get("/", (req, res) => {

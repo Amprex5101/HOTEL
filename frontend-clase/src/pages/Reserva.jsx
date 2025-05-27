@@ -1,17 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { jsPDF } from "jspdf";
+import axios from 'axios';
 import './Reserva.css';
 
 function Reserva() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [hotel, setHotel] = useState(null);
+  const [hotelDetail, setHotelDetail] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [showConfirmation, setShowConfirmation] = useState(false);
   
-  // Añade estos estados al inicio de tu componente Reserva
+  // Estados para el formulario de pago
   const [showPaymentForm, setShowPaymentForm] = useState(false);
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
   const [paymentSuccess, setPaymentSuccess] = useState(false);
@@ -56,35 +58,57 @@ function Reserva() {
     reservationNumber: '',
     roomNumber: ''
   });
+
+  // Añade al inicio de tu componente Reserva un estado para almacenar las habitaciones disponibles
+  const [availableRooms, setAvailableRooms] = useState({});
   
-  // Cargar datos del hotel
+  // Cargar datos del hotel desde la API
   useEffect(() => {
-    const fetchHotel = () => {
-      setLoading(true);
+    const fetchHotelData = async () => {
       try {
-        const allHotelsString = sessionStorage.getItem('allHotels');
-        const allHotels = allHotelsString ? JSON.parse(allHotelsString) : [];
-        const hotelId = parseInt(id);
-        const foundHotel = allHotels.find(h => h.id === hotelId);
+        setLoading(true);
+        setError(null);
         
-        if (foundHotel) {
-          setHotel(foundHotel);
-          // Inicializar el precio base con el precio del hotel
-          setBooking(prev => ({
-            ...prev,
-            totalPrice: foundHotel.price
-          }));
-        } else {
-          setError('No se encontró el hotel');
+        // Obtener información básica del hotel
+        const hotelResponse = await axios.get(`http://localhost:3000/api/hotels/${id}`);
+        if (!hotelResponse.data) {
+          throw new Error('Hotel no encontrado');
+        }
+        
+        const hotelData = hotelResponse.data;
+        setHotel(hotelData);
+        
+        // Inicializar el precio base con el precio del hotel
+        setBooking(prev => ({
+          ...prev,
+          totalPrice: hotelData.price
+        }));
+        
+        // Obtener detalles extendidos del hotel
+        const detailResponse = await axios.get(`http://localhost:3000/api/hotel-details?hotelId=${id}`);
+        if (detailResponse.data) {
+          setHotelDetail(detailResponse.data);
+          
+          // Rellenar las fechas del formulario si hay información de booking en sessionStorage
+          const bookingInfo = JSON.parse(sessionStorage.getItem('bookingInfo') || '{}');
+          if (bookingInfo.hotelId === parseInt(id) && bookingInfo.checkIn && bookingInfo.checkOut) {
+            setBooking(prev => ({
+              ...prev,
+              checkIn: bookingInfo.checkIn || '',
+              checkOut: bookingInfo.checkOut || '',
+              guests: bookingInfo.guests || 2
+            }));
+          }
         }
       } catch (error) {
-        setError('Error al cargar los datos del hotel');
+        console.error('Error al cargar datos del hotel:', error);
+        setError('Error al cargar información del hotel: ' + (error.message || 'Inténtelo de nuevo más tarde'));
       } finally {
         setLoading(false);
       }
     };
     
-    fetchHotel();
+    fetchHotelData();
   }, [id]);
   
   // Calcular duración de la estancia
@@ -142,13 +166,24 @@ function Reserva() {
   
   // Generar número aleatorio para la reserva
   const generateReservationNumber = () => {
-    return 'RES-' + Math.random().toString(36).substring(2, 8).toUpperCase();
+    const timestamp = new Date().getTime().toString().slice(-6);
+    const random = Math.random().toString(36).substring(2, 6).toUpperCase();
+    return `RES-${random}${timestamp}`;
   };
-  
+
   // Función para generar un número de habitación según el tipo
   const getRoomNumber = (roomTypeId) => {
-    // Cada tipo de habitación tiene un rango de números específico
-    switch (parseInt(roomTypeId)) {
+    const typeId = parseInt(roomTypeId);
+    const availableForType = availableRooms[typeId] || [];
+    
+    // Si tenemos habitaciones disponibles en la base de datos, elegimos una al azar
+    if (availableForType.length > 0) {
+      const randomIndex = Math.floor(Math.random() * availableForType.length);
+      return availableForType[randomIndex];
+    }
+    
+    // Si no hay habitaciones disponibles en la base de datos, usamos el método original
+    switch (typeId) {
       case 1: // Estándar
         return `10${Math.floor(Math.random() * 10) + 1}`; // 101-110
       case 2: // Superior
@@ -162,22 +197,67 @@ function Reserva() {
     }
   };
 
-  // Enviar reserva
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    
-    // Generar un número de habitación y agregarlo a la reserva
-    const roomNumber = getRoomNumber(booking.roomType);
-    setBooking(prev => ({
-      ...prev,
-      roomNumber: roomNumber
-    }));
-    
-    // Mostrar formulario de pago
-    setShowPaymentForm(true);
-  };
+  // Modificar el handleSubmit para validar la disponibilidad real
 
-  // Reemplaza la función handleCardChange con esta versión mejorada
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  
+  // Fetch available rooms first if we have dates
+  if (hotel && booking.checkIn && booking.checkOut) {
+    try {
+      const response = await axios.post(`http://localhost:3000/api/hotels/${id}/check-availability`, {
+        checkIn: booking.checkIn,
+        checkOut: booking.checkOut,
+        guests: booking.guests
+      });
+      
+      // Process room availability data
+      const roomsByType = {};
+      response.data.forEach(room => {
+        if (!roomsByType[room.typeId]) {
+          roomsByType[room.typeId] = [];
+        }
+        
+        const availableRoomNumbers = room.availability.rooms
+          .filter(r => r.isAvailable && !r.isReserved)
+          .map(r => r.roomNumber);
+        
+        roomsByType[room.typeId] = availableRoomNumbers;
+      });
+      
+      setAvailableRooms(roomsByType);
+      
+      // Update room types with actual availability
+      const updatedRoomTypes = roomTypes.map(roomType => ({
+        ...roomType,
+        available: roomsByType[roomType.id]?.length || 0
+      }));
+      
+      setRoomTypes(updatedRoomTypes);
+    } catch (error) {
+      console.error('Error al obtener habitaciones disponibles:', error);
+    }
+  }
+  
+  // Continue with the existing submit logic
+  // Verificar que el tipo de habitación seleccionado tenga disponibilidad
+  const selectedRoomType = roomTypes.find(room => room.id === parseInt(booking.roomType));
+  if (selectedRoomType && selectedRoomType.available <= 0) {
+    alert('Lo sentimos, no hay habitaciones disponibles del tipo seleccionado para las fechas indicadas.');
+    return;
+  }
+  
+  // Si hay habitaciones disponibles, obtener un número de habitación disponible
+  const roomNumber = getRoomNumber(booking.roomType);
+  
+  setBooking(prev => ({
+    ...prev,
+    roomNumber: roomNumber
+  }));
+  
+  // Mostrar formulario de pago
+  setShowPaymentForm(true);
+};
 
   const handleCardChange = (e) => {
     const { name, value } = e.target;
@@ -267,39 +347,193 @@ function Reserva() {
   };
 
   // Función para procesar el pago
-  const processPayment = () => {
-    const errors = validateCard();
+const processPayment = () => {
+  const errors = validateCard();
+  
+  if (Object.keys(errors).length > 0) {
+    setCardData(prev => ({
+      ...prev,
+      errors
+    }));
+    return;
+  }
+  
+  // Iniciar animación de procesamiento
+  setIsProcessingPayment(true);
+  
+  // Simulamos un tiempo de procesamiento
+  setTimeout(() => {
+    setIsProcessingPayment(false);
+    setPaymentSuccess(true);
     
-    if (Object.keys(errors).length > 0) {
-      setCardData(prev => ({
-        ...prev,
-        errors
-      }));
-      return;
+    // Generamos el número de reserva
+    const reservationNumber = generateReservationNumber();
+    const roomNumber = getRoomNumber(booking.roomType);
+    
+    setBooking(prev => ({
+      ...prev,
+      reservationNumber: reservationNumber,
+      roomNumber: roomNumber
+    }));
+    
+    // Mostramos la confirmación final después de un breve momento
+    setTimeout(async () => {
+      setShowPaymentForm(false);
+      
+      // Intentar guardar la reserva antes de mostrar confirmación
+      const saveSuccess = await saveReservationToDatabase(reservationNumber);
+      
+      if (saveSuccess) {
+        console.log('✅ Reserva registrada en el servidor correctamente');
+      } else {
+        console.log('⚠️ La reserva se guardó localmente debido a un problema con el servidor');
+        // Aquí podrías mostrar una alerta al usuario de que la reserva se guardó localmente
+      }
+      
+      // Mostrar confirmación de todos modos (éxito o fallo), ya que el pago fue aceptado
+      setShowConfirmation(true);
+      
+    }, 1500);
+  }, 3000);
+};
+
+  // Función para guardar la reserva en la base de datos
+const saveReservationToDatabase = async (reservationNumber) => {
+  // Preparar datos de reserva - definir la variable temprano para que esté disponible en todo el ámbito
+  let reservaData;
+  
+  try {
+    // Obtener el tipo de habitación seleccionado
+    const selectedRoom = roomTypes.find(room => room.id === parseInt(booking.roomType));
+    
+    // Preparar los servicios extras en el formato que espera el backend
+    const formattedExtraServices = booking.extraServices.map(serviceId => {
+      const service = extraServices.find(s => s.id === serviceId);
+      return {
+        id: service.id,
+        name: service.name,
+        price: service.price
+      };
+    });
+    
+    // Obtener username del localStorage o usar un valor predeterminado
+    const username = localStorage.getItem('username') || booking.firstName || "guest";
+    
+    // Crear el objeto de reserva para enviar al backend
+    reservaData = {
+      hotelId: parseInt(id),
+      hotelName: hotel.name,
+      roomType: {
+        id: selectedRoom.id,
+        name: selectedRoom.name,
+        price: selectedRoom.price
+      },
+      roomNumber: booking.roomNumber,
+      checkIn: booking.checkIn,
+      checkOut: booking.checkOut,
+      nights: calculateNights(),
+      cliente: {
+        username: username,
+        firstName: booking.firstName || "Huésped",
+        lastName: booking.lastName || "Anónimo",
+        email: booking.email || "guest@example.com",
+        phone: booking.phone || "0000000000"
+      },
+      guests: parseInt(booking.guests) || 1,
+      extraServices: formattedExtraServices,
+      specialRequests: booking.specialRequests || "",
+      totalPrice: booking.totalPrice,
+      paymentMethod: 'credit_card',
+      paymentStatus: 'paid',
+      status: 'confirmed',
+      reservationNumber: reservationNumber
+    };
+    
+    console.log('Enviando datos de reserva:', reservaData);
+    
+    // Enviar los datos al endpoint correcto de la API
+    const response = await axios.post('http://localhost:3000/api/reservas', reservaData);
+    
+    console.log('Reserva guardada exitosamente:', response.data);
+    
+    // Después de guardar la reserva exitosamente, actualizar la disponibilidad de la habitación
+if (response.data && response.data.reserva) {
+  try {
+    // Usar el id del componente en lugar de hotelId
+    const roomResponse = await axios.get(`http://localhost:3000/api/hotels/${id}/rooms`);
+    const rooms = roomResponse.data;
+    const selectedRoomType = rooms.find(room => room.typeId === parseInt(booking.roomType));
+    
+    if (selectedRoomType) {
+      // Actualiza la disponibilidad de la habitación específica
+      await axios.patch(`http://localhost:3000/api/rooms/${selectedRoomType._id}/availability`, {
+        roomNumber: reservaData.roomNumber,
+        isAvailable: false,
+        isReserved: true,
+        reservedUntil: booking.checkOut
+      });
+      
+      console.log('Estado de la habitación actualizado correctamente');
+    }
+  } catch (availabilityError) {
+    console.error('Error al actualizar disponibilidad de la habitación:', availabilityError);
+  }
+}
+    
+    return true;
+    
+  } catch (error) {
+    console.error('Error al guardar la reserva:', error);
+    
+    if (error.response) {
+      console.error('Datos de la respuesta de error:', error.response.data);
+      console.error('Estado del error:', error.response.status);
+      
+      // Si el error es "Habitación no disponible", intentemos con otro número de habitación
+      if (error.response.data.message === 'Habitación no disponible' && reservaData) {
+        try {
+          // Generar un nuevo número de habitación
+          const newRoomNumber = getRoomNumber(booking.roomType);
+          console.log(`Intentando con otra habitación: ${newRoomNumber}`);
+          
+          // Actualizar la reserva con el nuevo número de habitación
+          reservaData.roomNumber = newRoomNumber;
+          
+          // Intentar nuevamente con el nuevo número de habitación
+          const retryResponse = await axios.post('http://localhost:3000/api/reservas', reservaData);
+          console.log('Reserva guardada exitosamente con nueva habitación:', retryResponse.data);
+          return true;
+        } catch (retryError) {
+          console.error('Error en segundo intento:', retryError);
+        }
+      }
+    } else if (error.request) {
+      console.error('No se recibió respuesta del servidor');
+    } else {
+      console.error('Error al configurar la petición:', error.message);
     }
     
-    // Iniciar animación de procesamiento
-    setIsProcessingPayment(true);
+    // Guardar localmente como respaldo si la API falla
+    if (reservaData) {
+      try {
+        const localReservations = JSON.parse(localStorage.getItem('localReservations') || '[]');
+        const reservationWithTimestamp = {
+          ...reservaData,
+          createdAt: new Date().toISOString()
+        };
+        localReservations.push(reservationWithTimestamp);
+        localStorage.setItem('localReservations', JSON.stringify(localReservations));
+        console.log('Reserva guardada localmente como respaldo');
+      } catch (localStorageError) {
+        console.error('Error al guardar en localStorage:', localStorageError);
+      }
+    } else {
+      console.error('No se pudo guardar localmente: datos de reserva no definidos');
+    }
     
-    // Simulamos un tiempo de procesamiento
-    setTimeout(() => {
-      setIsProcessingPayment(false);
-      setPaymentSuccess(true);
-      
-      // Generamos el número de reserva
-      const reservationNumber = generateReservationNumber();
-      setBooking(prev => ({
-        ...prev,
-        reservationNumber: reservationNumber
-      }));
-      
-      // Mostramos la confirmación final después de un breve momento
-      setTimeout(() => {
-        setShowPaymentForm(false);
-        setShowConfirmation(true);
-      }, 1500);
-    }, 3000);
-  };
+    return false;
+  }
+};
 
   // Generar PDF con los detalles de la reserva
   const generatePDF = () => {
@@ -438,9 +672,38 @@ function Reserva() {
     doc.save("reserva-" + booking.reservationNumber + ".pdf");
   };
   
-  if (loading) return <div className="loading">Cargando detalles de reserva...</div>;
-  if (error) return <div className="error-message">{error}</div>;
-  if (!hotel) return <div className="error-message">No se pudo cargar la información del hotel</div>;
+  if (loading) {
+    return (
+      <div className="loading-container">
+        <div className="spinner"></div>
+        <p>Cargando detalles de reserva...</p>
+      </div>
+    );
+  }
+  
+  if (error) {
+    return (
+      <div className="error-container">
+        <h2>Error</h2>
+        <p>{error}</p>
+        <button onClick={() => navigate('/dashboard')} className="back-button">
+          Volver al dashboard
+        </button>
+      </div>
+    );
+  }
+  
+  if (!hotel) {
+    return (
+      <div className="error-container">
+        <h2>Hotel no encontrado</h2>
+        <p>Lo sentimos, no pudimos encontrar el hotel que estás buscando.</p>
+        <button onClick={() => navigate('/dashboard')} className="back-button">
+          Volver al dashboard
+        </button>
+      </div>
+    );
+  }
   
   return (
     <div className="booking-container">
@@ -913,6 +1176,23 @@ function Reserva() {
               </div>
             </div>
             
+            {/* Mostrar horarios de check-in y check-out si están disponibles en hotelDetail */}
+            {hotelDetail && (hotelDetail.checkIn || hotelDetail.checkOut) && (
+              <div className="hotel-policy-info">
+                <h3>Horarios del hotel</h3>
+                <div className="checkin-checkout-times">
+                  <div className="time-item">
+                    <span>Check-in:</span>
+                    <strong>{hotelDetail.checkIn || '15:00'}</strong>
+                  </div>
+                  <div className="time-item">
+                    <span>Check-out:</span>
+                    <strong>{hotelDetail.checkOut || '12:00'}</strong>
+                  </div>
+                </div>
+              </div>
+            )}
+            
             <button 
               className="confirm-booking-button" 
               onClick={handleSubmit} 
@@ -931,5 +1211,44 @@ function Reserva() {
     </div>
   );
 }
+
+// Añade esta función para obtener las habitaciones disponibles del hotel por tipo
+const fetchAvailableRooms = async (hotelId, checkIn, checkOut) => {
+  try {
+    const response = await axios.post(`http://localhost:3000/api/hotels/${hotelId}/check-availability`, {
+      checkIn,
+      checkOut,
+      guests: booking.guests
+    });
+    
+    // Organizar las habitaciones por tipo (typeId)
+    const roomsByType = {};
+    response.data.forEach(room => {
+      if (!roomsByType[room.typeId]) {
+        roomsByType[room.typeId] = [];
+      }
+      
+      // Filtra solo las habitaciones que están disponibles
+      const availableRoomNumbers = room.availability.rooms
+        .filter(r => r.isAvailable && !r.isReserved)
+        .map(r => r.roomNumber);
+      
+      roomsByType[room.typeId] = availableRoomNumbers;
+    });
+    
+    console.log('Habitaciones disponibles por tipo:', roomsByType);
+    setAvailableRooms(roomsByType);
+    
+    // Actualizar los tipos de habitación con la disponibilidad real
+    const updatedRoomTypes = roomTypes.map(roomType => ({
+      ...roomType,
+      available: roomsByType[roomType.id]?.length || 0
+    }));
+    
+    setRoomTypes(updatedRoomTypes);
+  } catch (error) {
+    console.error('Error al obtener habitaciones disponibles:', error);
+  }
+};
 
 export default Reserva;
